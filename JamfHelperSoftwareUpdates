@@ -1,23 +1,36 @@
 #!/bin/bash
-# This script displays a message that lets the user know that
-# a Software Update is available.
-# By Raphael Hernandez on 1/25/2022
+
+# This script displays a message that lets the user know that macOS updates are available and required to install
+# The script will bring up the Jamf Helper, and direct the user to their System Preferences or Self Service to install at a later time
+# by Raphael Hernandez on 1/25/2022
+
 
 ## Get the current logged in user
 loggedInUser=$(ls -l /dev/console | /usr/bin/awk '{ print $3 }')
-## Bring up the JamfHelper to prompt the user
+
 title="2U | MacOS"
-dialog="Test Test Test
-The Update button will open your System Preferences, and bring up the Software Update window."
-heading="Software Updates"
+dialog="Updates are waiting to be installed and requires a restart of your computer.
+
+Please install the updates by the deadline of 2/1/2022 anytime for your convenience. After the deadline has passed, the update will autoatically be applied and your computer will be restarted without any notice.
+
+The UPDATE button will open your System Preferences, and bring up the Software Update window.
+
+If you choose to update later, the update will be available in your Self Service application until the deadline."
+heading="Updates Available"
 description=`echo "$dialog"`
 button1="Update"
+button2="Self Service"
 alignDescription="left" 
-alignHeading="natural"
+alignHeading="left"
 jamfHelper="/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper"
 icon="/Users/$loggedInUser/Library/Application Support/com.jamfsoftware.selfservice.mac/Documents/Images/brandingimage.png"
-NOTIFICATION=`"$jamfHelper" -windowType utility -title "$title" -heading "$heading" -description "$description" -alignDescription "$alignDescription" -alignHeading "$alignHeading" -button1 "$button1" -icon "$icon"`
+
+NOTIFICATION=`"$jamfHelper" -windowType utility -title "$title" -heading "$heading" -description "$description" -alignDescription "$alignDescription" -alignHeading "$alignHeading" -button1 "$button1" -button2 "$button2" -icon "$icon"`
+
 if [ "$NOTIFICATION" == 0 ]; then
- open -b com.apple.systempreferences /System/Library/PreferencePanes/SoftwareUpdate.prefPane/
+  open -b com.apple.systempreferences /System/Library/PreferencePanes/SoftwareUpdate.prefPane/
+	elif [ "$NOTIFICATION" == 2 ]; then
+    	open -a /Applications/Self\ Service.app
 fi
+
 exit 0
