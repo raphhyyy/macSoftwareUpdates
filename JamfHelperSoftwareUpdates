@@ -1,0 +1,23 @@
+#!/bin/bash
+# This script displays a message that lets the user know that
+# a Software Update is available.
+# By Raphael Hernandez on 1/25/2022
+
+## Get the current logged in user
+loggedInUser=$(ls -l /dev/console | /usr/bin/awk '{ print $3 }')
+## Bring up the JamfHelper to prompt the user
+title="2U | MacOS"
+dialog="Test Test Test
+The Update button will open your System Preferences, and bring up the Software Update window."
+heading="Software Updates"
+description=`echo "$dialog"`
+button1="Update"
+alignDescription="left" 
+alignHeading="natural"
+jamfHelper="/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper"
+icon="/Users/$loggedInUser/Library/Application Support/com.jamfsoftware.selfservice.mac/Documents/Images/brandingimage.png"
+NOTIFICATION=`"$jamfHelper" -windowType utility -title "$title" -heading "$heading" -description "$description" -alignDescription "$alignDescription" -alignHeading "$alignHeading" -button1 "$button1" -icon "$icon"`
+if [ "$NOTIFICATION" == 0 ]; then
+ open -b com.apple.systempreferences /System/Library/PreferencePanes/SoftwareUpdate.prefPane/
+fi
+exit 0
